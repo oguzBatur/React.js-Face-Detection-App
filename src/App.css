@@ -50,3 +50,9 @@
   left: 0;
   z-index: -1;
 }
+
+.detect-image{
+  margin: 20px 0px;
+  border-radius: 20px;
+  width: 400px;
+}
