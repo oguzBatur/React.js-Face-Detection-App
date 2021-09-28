@@ -5,11 +5,10 @@ import ImageLinkForm from './components/imageform/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import Particles from 'react-particles-js';
 import React from "react";
-import Clarifai from 'clarifai';
 import FaceRecognition from './components/face-recog/FaceRecognition';
 import {userID, appID, apiKey, ModelID, ModelVersionID} from './config';
 import Signin  from './components/signin/Signin';
-
+import Register from './components/register/Register';
 
 const particleOptions = {
   particles: {
@@ -34,7 +33,8 @@ class App extends React.Component {
       box: {},
       value: 0.0,
       isCalculating: false,
-      route: 'signin'
+      route: 'signin',
+      isSigned: false
     }
   }
 
@@ -63,7 +63,7 @@ class App extends React.Component {
     this.setState({
       input: event.target.value,
     })
-    if(event.target.value == ' ') this.state.isOn = false;
+    if(event.target.value === ' ') this.setState({isOn: false})
   }
 
   onSubmit = (event) => {
@@ -116,7 +116,9 @@ class App extends React.Component {
 
   }
   onRouteChange = (route) => {
-      this.setState({
+    if(route === 'signin') this.setState({isSigned: false})  
+    else if (route === 'home') this.setState({isSigned: true})
+    this.setState({
         route: route
       })
   }
@@ -127,20 +129,25 @@ class App extends React.Component {
           className='particles' 
           params={particleOptions}
         />
-        { this.state.route === 'signin'
+        <Navigation onRouteChange = {this.onRouteChange} isSigned={this.state.isSigned} />
+        { this.state.route === 'home'
 
         ?
 
-          <Signin onRouteChange={this.onRouteChange}/>
-        :
-          <div>
-           <Navigation onRouteChange = {this.onRouteChange} />
+        <div>
            <Logo/>
             <Rank/>
             <ImageLinkForm  onInputChange={this.onInputChange} onSubmit={this.onSubmit}/>
             <FaceRecognition calculation={this.state.isCalculating} box={this.state.box} value={this.state.value} image={this.state.imageUrl} trigger={this.state.isOn}/>
           </div>
-
+        :
+        (this.state.route === 'signin' 
+          ? 
+          <Signin onRouteChange={this.onRouteChange}/>
+          :
+          <Register onRouteChange={this.onRouteChange} />
+        )
+          
         }
         
       </div>
