@@ -3,7 +3,6 @@
 }
 .center{
   display: flex;
-  align-items: center;
   justify-content: center;
   
 }
@@ -54,5 +53,13 @@
 .detect-image{
   margin: 20px 0px;
   border-radius: 20px;
-  width: 400px;
+  width: 400px;  
+}
+
+.height{
+  height: auto;
+}
+.flexin{
+  display: flex;
+  flex-direction: column;
 }

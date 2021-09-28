@@ -1,14 +1,25 @@
 import React from "react";
-
-const FaceRecognition = ({image, trigger}) => {
-
-    
-    if(trigger)
+import './FaceRecognition.css';
+const FaceRecognition = ({image, trigger, box, value, calculation}) => {
+    if(trigger && calculation)
     {
         return(
-            <div>
-                <img src={image} alt='Output' className='center detect-image'/>
+            <div className = 'center ma height'>
+                <div className= 'absolute mt2'>                
+                    <img  id='inputimage' src={image} alt='Output'  className='center detect-image'/>
+                    <div className ='bounding-box' style={{top: box.topRow, right: box.rightCol, bottom: box.bottomRow, left: box.leftCol}}></div>
+                </div>
             </div>
+        )
+    }
+    else if(trigger && !calculation){
+        return(
+            <div className = 'center ma height'>
+            <div className= 'absolute mt2'>        
+                <p>Calculating Image....</p>        
+                <img  id='inputimage' src={image} alt='Output'  className='center detect-image'/>
+            </div>
+        </div>
         )
     }
     else{
