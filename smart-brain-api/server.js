@@ -4,7 +4,10 @@ const app = express();
 const cors = require('cors');
 const config = require('./config.js');
 
-//KNEX
+
+
+
+//? Kullanıcılar Veritabanı
 const db = require('knex')({
     client: 'pg',
     connection: {
@@ -16,22 +19,97 @@ const db = require('knex')({
 });
 ////
 
+// Giriş Veritabanı
+
 
 
 //! Functions
 
-const knexScraper = (dataB, req) => {
-    const {email, name, joined} = req.body;
-    dataB('users')
-        .returning('*')
-        .insert({
-        email: email,
-        name: name,
-        joined: new Date()
-    })
-        .then(user => console.log(user))
-        .catch(err => console.log('Unable to register.'))
+const knexScraper = (dataB, req,res, purpose, errorMsg) => {
+
+    if(purpose === 'login')
+    {
+
+        dataB.select('email', 'hash').from('login')
+            .where('email', '=', req.body.email)
+            .then(data => {
+               const isValid = bcrypt.compareSync(req.body.password, data[0].hash);
+               if(isValid)
+               {
+                   db.select('*').from('users')
+                       .where('email', '=', req.body.email)
+                       .then(user => {
+                           res.json(user[0]);
+                       })
+                       .catch(err => res.status(400).json('unable to get user'))
+
+               }
+               else
+               {
+                   res.status(400).json('wrong credentials');
+               }
+            })
+            .catch(err =>res.status(400).json('wrong credentials.'));
+
+    }
+    else if (purpose === 'register')
+    {
+        const hash = bcrypt.hashSync(req.body.password);
+        if(req.body.password.length > 6 && req.body.email.length > 0)
+        {
+            dataB.transaction(trx => {
+                trx.insert({
+                    hash: hash,
+                    email: req.body.email
+                })
+                    .into('login')
+                    .returning('email')
+                    .then(logEmail => {
+                        trx('users')
+                            .returning('*')
+                            .insert({
+                                email: logEmail[0],
+                                name: req.body.name.toLowerCase(),
+                                joined: new Date()
+                            })
+                            .then(user => res.json(user[0]))
+                            .catch(err => res.status(400).json(errorMsg))
+                    })
+                    .then(trx.commit)
+                    .catch(trx.rollback)
+            })
+                .catch(err => res.status(400).json(errorMsg));
+        }
+        else
+        {
+            res.status(401).json('fill in the blank mk');
+        }
+
+    }
+    else if (purpose === 'profile')
+    {
+        dataB.select('*').from('users').where({
+            id: req.params.id
+        })
+        .then(user => {
+            if(user.length) res.json(user[0]);
+            else res.status(400).json(errorMsg);
+        })
+        .catch(err => {
+            res.status(400).json(errorMsg);
+        })
+    }
+    else if (purpose === 'image')
+    {
+        dataB('users').where('id', '=', req.body.id)
+            .increment('entries', 1)
+            .returning('entries')
+            .then(entry => res.json(entry[0]))
+            .catch(err => res.status(400).json('unable to get entries.'))
+    }
+
 }
+//TODO 1. signin özelliğini kullanabilmek için veritabanı ile server arasındaki ilişkiyi hallet. DONE
 
 
 
@@ -49,33 +127,30 @@ app.get('/', (req, res) => {
 
 //! SIGNIN ROUTE
 app.post('/signin', (req, res) => {
-
+    knexScraper(db,req,res, 'login','email or password is incorrect, please try again.');
 
 });
 
 //! REGISTER ROUTE
 app.post('/register', (req, res) => {
     const { email, name, password} = req.body;
-    db('users').insert({
-        email: email,
-        name: name,
-        joined: new Date()
-    }).then(console.log)
+    knexScraper(db,req,res, 'register','An error occured please try again.');
 
 });
 
 app.get('/profile/:id', (req, res) => {
-    const { id } = req.params;
+
+    knexScraper(db,req,res,'profile','Cant fetch profile, probably id is not correct.');
 })
 
 app.put('/image', (req,res) => {
-    const {id} = req.body;
+    knexScraper(db, req,res, 'image', 'Not found.')
+
 })
 
 //! LISTEN TO PORT
 app.listen(3000, () =>{
-    console.log('App is running on port 3000');
-    
+    console.log('Uygulama 3000 portunda çalışıyor...');
 });
 
 

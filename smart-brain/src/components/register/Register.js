@@ -40,13 +40,14 @@ class Register extends React.Component{
         })
         .then(resp => resp.json())
         .then(data => {
-            if(data)
+            if(data.id)
             {
                 this.props.userData(data);
                 this.props.onRouteChange('home')
-            } 
+            }
         });
     }
+
 
     render()
     {

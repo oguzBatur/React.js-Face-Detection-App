@@ -6,12 +6,14 @@ class Signin extends React.Component {
         super(props);
         this.state = {
             signInEmail: '',
-            signInPassword: ''
+            signInPassword: '',
+            correct: true
         }
     }
     
     onEmailChange = (event) =>{
-        this.setState({signInEmail: event.target.value})
+        this.setState({signInEmail: event.target.value,
+                            correct: true})
     }
 
 
@@ -31,12 +33,17 @@ class Signin extends React.Component {
         })
         .then(response => response.json())
         .then(data =>{
-            if(data)
-            {
-                this.props.userData(data);
-                this.props.onRouteChange('home');  
-            } 
-        });
+          if(data.id)
+          {
+              this.props.userData(data);
+              this.props.onRouteChange('home');
+          }
+          else
+          {
+              this.setState({correct: false})
+          }
+        })
+
 
 
         
@@ -45,6 +52,18 @@ class Signin extends React.Component {
 
     render(){
         const { onRouteChange} = this.props;
+        const validationCheck = () => {
+            if(!this.state.correct)
+            {
+                return(
+                    <p style={{color: 'darkred'}}>Wrong credentials!</p>
+                )
+            }
+            else{
+                return(<div></div>)
+            }
+
+        }
         return(
             <article className="br3 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
     
@@ -68,6 +87,7 @@ class Signin extends React.Component {
                         onClick={this.onSubmitSignIn}                    
                         />
                         </div>
+                        {validationCheck()}
                         <div className="lh-copy mt3">
                         <a href="#0" onClick={()=> onRouteChange('register')} className="f6 link dim black db">Register</a>
                         </div>

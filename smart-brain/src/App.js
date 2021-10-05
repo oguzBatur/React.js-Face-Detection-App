@@ -70,7 +70,7 @@ class App extends React.Component {
     console.log(info);
     return {
       leftCol: clariFace.left_col * width,
-      topRow:    1.15 *(clariFace.top_row * height),
+      topRow:    1.15 * (clariFace.top_row * height),
       rightCol: width - (clariFace.right_col * width),
       bottomRow: height * 1.1 - (clariFace.bottom_row * height)
     }
@@ -86,6 +86,20 @@ class App extends React.Component {
       input: event.target.value,
     })
     if(event.target.value === ' ') this.setState({isOn: false})
+  }
+
+  onSubmitImage = () => {
+    fetch('http://localhost:3000/image', {
+      method: 'put',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        id: this.state.user.id
+      })
+    })
+        .then(resp => resp.json())
+        .then(data => {
+          this.state.user.entries = data;
+        });
   }
 
   onSubmit = () => {
@@ -119,8 +133,6 @@ class App extends React.Component {
       },
       body: raw
     };
-    
-  
     fetch(`https://api.clarifai.com/v2/models/${ModelID}/versions/${ModelVersionID}/outputs`, requestOptions)
       .then(response => {
        
@@ -129,13 +141,10 @@ class App extends React.Component {
       .then(result => {
         // let box = JSON.parse(result, null, 2).outputs[0].data.regions[0].region_info.bounding_box;
         // let value = JSON.parse(result, null, 2).outputs[0].data.regions[0].value;
-     
-        this.displayFaceBox(this.calculateFaceLocation(JSON.parse(result, null, 2))); 
+
+        this.displayFaceBox(this.calculateFaceLocation(JSON.parse(result, null, 2)));
         this.setState({
           isCalculating: true,
-          user:{
-            entries: this.state.user.entries + 1
-          }
         })
       })
       .catch(error => console.log('error', error));
@@ -150,6 +159,7 @@ class App extends React.Component {
       })
   }
 
+  haneup
 
   render(){
     return (
@@ -165,12 +175,12 @@ class App extends React.Component {
 
         <div>
            <Logo/>
-            <Rank userEntries={this.state.user.entries} />
-            <ImageLinkForm  onInputChange={this.onInputChange} onSubmit={this.onSubmit}/>
+            <Rank userEntry={this.state.user.entries} userName={this.state.user.name} />
+            <ImageLinkForm  onInputChange={this.onInputChange} onSubmitImage={this.onSubmitImage} onSubmit={this.onSubmit}/>
             <FaceRecognition calculation={this.state.isCalculating} box={this.state.box} value={this.state.value} image={this.state.imageUrl} trigger={this.state.isOn}/>
           </div>
         :
-        (this.state.route === 'signin' 
+        (this.state.route === 'signin'
           ? 
           <Signin  userData={this.retrieveUserData} onRouteChange={this.onRouteChange}/>
           :

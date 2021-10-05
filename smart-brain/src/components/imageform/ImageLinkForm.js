@@ -1,24 +1,33 @@
 import React from "react";
 import './ImageLinkForm.css';
-const ImageLinkForm = ({onInputChange, onSubmit}) => {
-    return(
+class ImageLinkForm extends React.Component{
 
-        <div>
-            <p className='f3'>
-                {'This Magic Brain will detect faces in your pictures. Give it a try.'}
-            </p>
-            <div className='center'>
-                <div className='pa4 form br3 shadow-5  center'>
-                    <input className='f4 pa2 w-70 center' type='text' onChange={onInputChange}/>
-                    <button className='w-30 grow f4 link ph3 pv2 dib white bg-light-purple' onClick={onSubmit}>
-                        Detect
-                    </button>     
+    render()
+    {
+        return(
+
+            <div>
+                <p className='f3'>
+                    {'This Magic Brain will detect faces in your pictures. Give it a try.'}
+                </p>
+                <div className='center'>
+                    <div className='pa4 form br3 shadow-5  center'>
+                        <input className='f4 pa2 w-70 center' type='text' onChange={this.props.onInputChange}/>
+                        <button className='w-30 grow f4 link ph3 pv2 dib white bg-light-purple' onClick={() => {
+                            this.props.onSubmit();
+                            this.props.onSubmitImage();
+                            }
+                        }>
+                            Detect
+                        </button>
+                    </div>
+
                 </div>
-               
             </div>
-        </div>
 
-    )
+        )
+    }
+
 }
 
 export default ImageLinkForm;

@@ -1,20 +1,23 @@
 import React from "react";
 
 
-const Rank = ({userEntries}) => {
-    
-    return(
+class Rank extends React.Component {
+    render()
+    {
+        const modifiedName = this.props.userName[0].toUpperCase() + this.props.userName.slice(1);
+        return(
 
-        <div>
-            <div className='white f3'>
-                {'Batur, your current entries is...'}
+            <div>
+                <div className='white f3'>
+                    {`${modifiedName}, your current entries is...`}
+                </div>
+                <div className='white f1'>
+                    {this.props.userEntry}
+                </div>
             </div>
-            <div className='white f1'>
-                {userEntries}
-            </div>
-        </div>
+        )
+    }
 
-    )
 }
 
 export default Rank;
