@@ -22,5 +22,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# API Anahtarları.
-/src/config.js
+# Erişim Anahtarları.
+/smart-brain/src/config.js
+# Veri tabanına erişim
+../smart-brain-api/config.js
