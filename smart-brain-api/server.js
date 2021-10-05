@@ -148,9 +148,12 @@ app.put('/image', (req,res) => {
 
 })
 
+
+
+
 //! LISTEN TO PORT
-app.listen(3000, () =>{
-    console.log('Uygulama 3000 portunda çalışıyor...');
+app.listen(process.env.PORT || 3000, () =>{
+    console.log(`Uygulama ${process.env.PORT} portunda çalışıyor...`);
 });
 
 
